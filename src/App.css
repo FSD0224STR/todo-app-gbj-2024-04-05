@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  border: 1px black solid;
+  border-radius: 1rem;
+  padding: 2rem;
+  gap: 1rem;
+}

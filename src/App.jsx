@@ -52,12 +52,24 @@ function App() {
   const handleChangeDate = (event) => {
     setDate(event.target.value)
   }
+  const handleOnSubmit = (event) => {
+    event.preventDefault();
+    const taskName = event.target.taskName.value;
+    const taskDate = event.target.taskDate.value;
+    // fetch
+  }
   
   return (
     <>
+    <div className='task-form'>
+      <form onSubmit={handleOnSubmit} action="" method='GET'>
+        <input type="text" name="taskName" required="1" placeholder='name'/>
+        <input type="date" name="taskDate"  />
+        <button type="submit"  > Add task</button>
+      </form>
+    </div>
     {error && <span>Errrrrooorr</span>}
-    <button onClick={handleAddRandomTaskClick}> Add Random task</button>
-    <input type="date" onChange={handleChangeDate}/>
+    <input type="date" onChange={handleChangeDate} />
     <span>{date}</span>
     <div className='task-list'>
       <h1>Tasks of day {date}</h1>
@@ -68,6 +80,7 @@ function App() {
       <h1>All tasks</h1>
       {allTasks.map((task) => <div className='task-item'>{task.name}</div>)}
     </div>
+
     </>
   )
 }
