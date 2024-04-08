@@ -3,6 +3,8 @@ import './App.css'
 import { readTasksFromServer } from './api-calls';
 import { todayInString, isFutureDate } from './utils';
 import Loader from './loader';
+import { useForm } from "react-hook-form"
+
 
 
 function App() {
@@ -23,44 +25,16 @@ function App() {
     };
     reloadTasksState();
 }, [date]);
-  // useEffect(() => {
-  //   console.log('new Date: ' + date);
-  //   return () => {
-  //     console.log('old Date:' + date);
-  //   };
-  // }, [date]);
-
   const handleChangeDate = (event) => {
     setDate(event.target.value)
   }
-  const handleOnSubmit = (event) => {
-    event.preventDefault();
-    const taskName = event.target.taskName.value;
-    const taskDate = event.target.taskDate.value;
-    // 1. task Name has at least 3 characters
+  const { register, 
+    formState: { errors },
+    handleSubmit 
+  } = useForm();
 
-   
-    // 2. task Name has less than 20 characters
-    if (taskName.length > 20) {
-      setFormError('Task name should be less than 20 chars long');
-      return;
-    }
-    // 3. date is present
-    if (taskDate === '') { 
-      setFormError('Date is mandatory');
-      return;
-    }
-    
-    // 4. date is after today
-    if (!isFutureDate(taskDate)) { 
-      setFormError('Date should be a future date');
-      return;
-    }
-    
-
-    // fetch
-    setFormError('');
-    const body = { name: taskName, date: taskDate};
+  const handleOnSubmit2 = (data) => {
+    const body = { name: data.taskName, date: data.taskDate};
     setLoading(true);
     fetch("http://localhost:3000/task", {
         method:"POST", 
@@ -84,16 +58,24 @@ function App() {
   return (
     <>
     <div >
-      <form className='task-form' onSubmit={handleOnSubmit} action="" method='GET'>
-        <input type="text" name="taskName" placeholder='name' 
-        validation={() => {
-          if (taskName.length < 3) {
-            setFormError('Task name should be at least 3 chars long');
-            return;
-          }
-        }}/>
-        <input type="date" name="taskDate"  />
-        {formError && <span className='form-error'>{formError}</span>}
+      <form className='task-form' onSubmit={handleSubmit(handleOnSubmit2)} action="" method='GET'>
+        <input type="text" {...register('taskName', {required: true, minLength: 3, maxLength: 20})}/>
+        <input type="date" {...register('taskDate', {required: true, validate: { isFutureDate: (value) => isFutureDate(value)}})}  />
+        {errors.taskName?.type === "required" && (
+          <p role="alert">Name is required</p>
+        )}
+        {errors.taskName?.type === "minLength" && (
+          <p role="alert">Name min length is 3</p>
+        )}
+        {errors.taskName?.type === "maxLength" && (
+          <p role="alert">Name max length is 20</p>
+        )}
+        {errors.taskDate?.type === "required" && (
+          <p role="alert">Date is required</p>
+        )}
+        {errors.taskDate?.type === "isFutureDate" && (
+          <p role="alert">Date should be a future date</p>
+        )}
         <button type="submit"  > Add task</button>
       </form>
     </div>
